@@ -54,7 +54,53 @@ textarea{min-height:84px;resize:vertical}
 .sheet.on{display:flex}
 .sheet .in{background:var(--card);width:100%;max-width:560px;border-radius:18px 18px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom))}
 .err{background:var(--red2);color:var(--red);border-radius:10px;padding:10px 12px;font-size:14px;margin-top:12px;display:none}
-/* ---------- host board ---------- */
+/* ---------- teams: choice, spin, glow ---------- */
+.btn.spin{background:#1f4fd1}
+.linkb{background:none;border:0;color:var(--green);font-weight:600;padding:12px 0 0;cursor:pointer;font-size:14px}
+.team i{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:8px;vertical-align:-1px}
+.wheel{height:220px;border-radius:22px;margin:4px 0 14px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#e2dccf;color:#1d1d1b;transition:background .06s;box-shadow:inset 0 0 0 6px rgba(255,255,255,.35)}
+.wsym{font-size:64px;line-height:1}.wname{font-size:30px;font-weight:750;margin-top:6px;letter-spacing:.01em}
+button.chip{border:0;cursor:pointer;font-family:inherit}
+button.chip u{font-weight:500;opacity:.85;margin-left:4px}
+#glow{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;text-align:center;padding:24px;animation:breathe 1.6s ease-in-out infinite}
+#glow.on{display:flex}
+@keyframes breathe{50%{filter:brightness(1.22) saturate(1.1)}}
+#glow .gs{font-size:min(34vw,170px);line-height:1}
+#glow .gk{font:600 13px ui-monospace,Menlo,Consolas,monospace;letter-spacing:.16em;text-transform:uppercase;opacity:.8;margin-top:6px}
+#glow .gn{font-size:min(15vw,72px);font-weight:800;line-height:1.05;margin:4px 0 14px;word-break:break-word}
+#glow p{font-size:18px;line-height:1.4;margin:0 0 22px;opacity:.95}
+#glow .gb{border:2.5px solid currentColor;background:transparent;color:inherit;border-radius:999px;padding:13px 26px;font-weight:700;font-size:17px;cursor:pointer}
+.tctl{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:0 0 14px;display:flex;flex-wrap:wrap;gap:10px 22px;align-items:center;font-size:15px}
+.tctl .seg{display:inline-flex;border:1.5px solid var(--green);border-radius:999px;overflow:hidden}
+.tctl .seg button{border:0;background:#fff;color:var(--green);padding:6px 12px;font-weight:650;cursor:pointer;font-size:14px}
+.tctl .seg button.on{background:var(--green);color:#fff}
+.tctl .stp{display:inline-flex;align-items:center;gap:6px}
+.tctl .stp button{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--green);background:#fff;color:var(--green);font-weight:800;cursor:pointer}
+.tctl .stp b{min-width:24px;text-align:center;font-size:18px}
+.tctl .lk{border:1.5px solid var(--green);border-radius:999px;padding:6px 14px;background:#fff;color:var(--green);font-weight:650;cursor:pointer}
+.tctl .lk.on{background:var(--red);border-color:var(--red);color:#fff}
+.tctl .st{color:var(--mute);font-size:14px;flex-basis:100%}
+.tiles .tile{border-top:8px solid var(--tc,var(--line))}
+.tile h3 .sy{color:var(--tc)}
+.rn{display:flex;gap:8px;margin:10px 0 0}.rn input{flex:1}
+/* ---------- take it with you: PDF (print) + WhatsApp ---------- */
+.takep .row2{display:flex;gap:10px;flex-wrap:wrap}.takep .row2 .btn{flex:1 1 150px}
+.btn.wa{background:#1f8f4e}
+#take{display:none}
+@media print{
+ @page{size:A4;margin:14mm}
+ body{background:#fff!important}
+ #app,#sheet,#ov,#glow{display:none!important}
+ #take{display:block;color:#111;font:11pt/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+ #take h1{font-size:18pt;margin:0 0 2pt}#take .sub{color:#555;font-size:9.5pt;margin:0 0 8pt}
+ #take h2{font-size:12pt;margin:12pt 0 4pt;padding-bottom:2pt;border-bottom:1.5pt solid #1f5e47;color:#1f5e47;break-after:avoid}
+ #take .tm{display:inline-block;padding:2pt 8pt;border-radius:20pt;font-weight:700;margin:2pt 0 4pt}
+ #take table{width:100%;border-collapse:collapse;font-size:10pt}#take td{border:1px solid #ccc;padding:4pt 6pt;vertical-align:top}
+ #take td:first-child{width:28%;font-weight:600;background:#f4f1ea}
+ #take ul{margin:2pt 0;padding-left:14pt}#take li{margin:1pt 0}
+ #take .two{columns:2;column-gap:14pt}
+ #take .foot{margin-top:12pt;font-size:9pt;color:#555;border-top:1px solid #ccc;padding-top:5pt}
+}
 body.host{font-size:18px;background:#efe9dd}
 .board{display:grid;grid-template-columns:300px 1fr;gap:22px;padding:20px 24px;min-height:100vh}
 .side{position:sticky;top:20px;align-self:start}
@@ -97,6 +143,7 @@ body.host{font-size:18px;background:#efe9dd}
 <div id="app"></div>
 <div class="sheet" id="sheet"><div class="in" id="sheetIn"></div></div>
 <div class="ov" id="ov"><div class="in" id="ovIn"></div></div>
+<div id="glow" role="dialog" aria-live="assertive"></div>
 <script>
 var EXEC = "https://script.google.com/macros/s/AKfycbzaIpTuwXEhgD6Y1fvxEP8tJhvtyHaKcY07zGcKBELmz-fpGlUr7x7hpA9WXbAo47tMUQ/exec";
 var BOOT = (function(){var q=new URLSearchParams(location.search).get('p');var parts=location.pathname.split('/').filter(Boolean);var p=String(q||parts[parts.length-1]||'').replace(/\.html$/,'').replace(/^\/+|\/+$/g,'').toLowerCase();if(p==='index')p='';var m=p.match(/^([a-z0-9-]+?)-host-([a-z0-9]+)$/);var ev=m?m[1]:p;if(!/^[a-z0-9-]{0,40}$/.test(ev))ev='';return {mode:m?'host':'student',event:ev,key:m?m[2]:'',t:''}})();
@@ -111,6 +158,8 @@ var BOXES = [
   {f:'E', name:'Expansion: how we\'ll know, and what\'s next', step:'Test', p:'Test with how many people? What counts as success? Your first-sale target before 27 Nov.', ex:'e.g. Offer to 20 students over two nights. Success = 10 sold, 3 ask again. Target: 100 packs.'}
 ];
 var ORDER = ['join','hand','card','after'];
+var PAL = [['Cobalt','#1f4fd1','#fff'],['Crimson','#c8102e','#fff'],['Emerald','#0f9d58','#fff'],['Amber','#ffb300','#1d1d1b'],['Violet','#7b3fe4','#fff'],['Teal','#00897b','#fff'],['Coral','#ff6f61','#1d1d1b'],['Indigo','#3f2b96','#fff'],['Lime','#9ccc3c','#1d1d1b'],['Rose','#e91e8c','#fff'],['Slate','#455a64','#fff'],['Gold','#d4a017','#1d1d1b'],['Mint','#3ddc97','#1d1d1b'],['Plum','#8e244d','#fff'],['Orange','#f57c00','#1d1d1b'],['Sky','#29b6f6','#1d1d1b']];
+var SUITS = ['\u2660','\u2665','\u2666','\u2663'], choice = null, spinning = false, wl = null;
 function $(id){return document.getElementById(id)}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return store['_'+k]=v===undefined?store['_'+k]:v}}
@@ -138,15 +187,30 @@ function renderStudent(){
   var v=state, a=$('app'), t=v.team;
   var h='<div class="wrap"><div class="brand"><i></i>The Next Hand · Live</div><h1>'+esc(v.title)+'</h1>';
   if(!t){
-    h+='<div class="panel"><h2>Which team are you in?</h2><p class="hint">Pick your team. Not listed? One person creates it; everyone else waits a moment and picks it. This phone stays with one team.</p>';
-    if(v.teams.length){v.teams.forEach(function(x){h+='<button class="team" data-join="'+esc(x.id)+'" data-name="'+esc(x.name)+'"><b>'+esc(x.name)+'</b><span>'+x.members+' phone'+(x.members==1?'':'s')+'</span></button>'});h+='<div class="or">or</div>'}
-    h+='<input type="text" id="newName" maxlength="40" placeholder="New team name" autocomplete="off"><div style="height:10px"></div><button class="btn" id="mk">Create team and join</button><div class="err" id="err"></div></div>';
+    var cf=v.cfg||{mode:'both',lock:false}, mode=cf.mode==='spin'?'spin':cf.mode==='own'?'own':(choice||'ask');
+    if(mode==='ask'){
+      h+='<div class="panel"><h2>Already in an InnoHatch team?</h2><p class="hint">This phone stays with one team.</p><button class="btn" id="cOwn">Yes · pick my team</button><div style="height:10px"></div><button class="btn spin" id="cSpin">No · spin for a team</button></div>';
+      a.innerHTML=h+'</div>';
+      $('cOwn').onclick=function(){choice='own';render()};$('cSpin').onclick=function(){choice='spin';render()};
+      return;
+    }
+    if(mode==='spin'){
+      h+='<div class="panel"><h2>Spin for your team</h2><p class="hint">You\'ll land in a team with people you may not know yet. That\'s the point.</p><div class="wheel" id="wheel"><div class="wsym" id="wsym">?</div><div class="wname" id="wname">Ready</div></div><button class="btn spin" id="spinB">Spin</button><div class="err" id="err"></div>'+(cf.mode==='both'?'<button class="linkb" id="back">← I already have a team</button>':'')+'</div>';
+      a.innerHTML=h+'</div>';
+      $('spinB').onclick=doSpin;if($('back'))$('back').onclick=function(){choice=null;render()};
+      return;
+    }
+    h+='<div class="panel"><h2>Which team are you in?</h2><p class="hint">'+(cf.lock?'Pick your team. Not listed? Ask your speaker.':'Pick your team. Not listed? One person creates it; everyone else waits a moment and picks it.')+' This phone stays with one team.</p>';
+    if(v.teams.length){v.teams.forEach(function(x){h+='<button class="team" data-join="'+esc(x.id)+'" data-name="'+esc(x.name)+'"><b><i style="background:'+esc(x.col)+'"></i>'+esc(x.name)+'</b><span>'+x.members+' phone'+(x.members==1?'':'s')+'</span></button>'});if(!cf.lock)h+='<div class="or">or</div>'}
+    if(!cf.lock)h+='<input type="text" id="newName" maxlength="40" placeholder="New team name" autocomplete="off"><div style="height:10px"></div><button class="btn" id="mk">Create team and join</button>';
+    h+='<div class="err" id="err"></div>'+(cf.mode==='both'?'<button class="linkb" id="back">← No team? Spin for one</button>':'')+'</div>';
     a.innerHTML=h+'</div>';
     a.querySelectorAll('[data-join]').forEach(function(b){b.onclick=function(){confirmJoin({teamId:b.dataset.join},b.dataset.name)}});
-    $('mk').onclick=function(){var n=$('newName').value.trim();if(n.length<2){showErr('Give your team a name (at least 2 letters).');return}var ex=v.teams.filter(function(x){return x.name.toLowerCase()==n.toLowerCase()})[0];confirmJoin(ex?{teamId:ex.id}:{name:n},ex?ex.name:n)};
+    if($('mk'))$('mk').onclick=function(){var n=$('newName').value.trim();if(n.length<2){showErr('Give your team a name (at least 2 letters).');return}var ex=v.teams.filter(function(x){return x.name.toLowerCase()==n.toLowerCase()})[0];confirmJoin(ex?{teamId:ex.id}:{name:n},ex?ex.name:n)};
+    if($('back'))$('back').onclick=function(){choice='spin';render()};
     return;
   }
-  h+='<div class="chip">● '+esc(t.name)+' · '+t.members+' phone'+(t.members==1?'':'s')+'</div>';
+  h+='<button class="chip" id="chipG" style="background:'+esc(t.col||'#1f5e47')+';color:'+esc(t.ink||'#fff')+'">'+esc(t.sym||'●')+' '+esc(t.name)+' · '+t.members+' phone'+(t.members==1?'':'s')+' <u>glow</u></button>';
   // hand
   if(!stageAt('hand')&&!t.hand){h+='<div class="panel"><div class="wait"><span class="dot"></span>You\'re in. Watch the screen for the next step.</div></div>'}
   if(stageAt('hand')||t.hand){
@@ -179,11 +243,64 @@ function renderStudent(){
     (t.logs||[]).forEach(function(l){h+='<div class="entry"><b>'+esc(new Date(l.ts).toLocaleDateString('en-IN',{day:'numeric',month:'short'}))+(l.sales||l.salesRs?' · '+l.sales+' sold · ₹'+l.salesRs:'')+'</b><div>'+esc(l.tested)+(l.learnt?' → '+esc(l.learnt):'')+(l.changed?' · next: '+esc(l.changed):'')+'</div></div>'});
     h+='</div>';
   }
+  h+='<div class="panel takep"><h2>Take it with you</h2><p class="hint">Your hand, your Experiment Card, your log and the six moves from today, on one page. Save it, or send it to yourself on WhatsApp.</p><div class="row2"><button class="btn" id="pdfB">Save as PDF</button><button class="btn wa" id="waB">Send to my WhatsApp</button></div><p class="hint" style="margin:8px 0 0;font-size:12.5px">PDF: in the print screen choose "Save as PDF" (iPhone: Share, then Save to Files). WhatsApp: pick "Message yourself".</p></div>';
   a.innerHTML=h+'</div>';
+  if($('chipG'))$('chipG').onclick=function(){glow(t)};
+  if($('pdfB'))$('pdfB').onclick=function(){takeHtml(t);setTimeout(function(){window.print()},60)};
+  if($('waB'))$('waB').onclick=function(){location.href='https://wa.me/?text='+encodeURIComponent(takeText(t))};
   if($('deal'))$('deal').onclick=function(){this.disabled=true;this.textContent='Dealing…';act({op:'deal'})};
   if($('redeal'))$('redeal').onclick=function(){this.disabled=true;act({op:'redeal'})};
   if(stageAt('card'))BOXES.forEach(function(b){var el=$('f'+b.f);el.value=t.card[b.f]||'';el.oninput=function(){dirty[b.f]=1;setSt('Typing…','');clearTimeout(timers[b.f]);timers[b.f]=setTimeout(function(){saveField(b.f)},1200)};el.onblur=function(){if(dirty[b.f]){clearTimeout(timers[b.f]);saveField(b.f)}}});
   if($('addLog'))$('addLog').onclick=function(){var b=this;b.disabled=true;act({op:'log',entry:{tested:$('lT').value,learnt:$('lL').value,changed:$('lC').value,sales:$('lS').value,salesRs:$('lR').value}},function(){b.disabled=false})};
+}
+/* Spin: the wheel cycles colours while the server picks the emptiest team, then slows and lands on it. */
+function doSpin(){
+  if(spinning)return;spinning=true;var B=$('spinB');B.disabled=true;B.textContent='Spinning…';if($('back'))$('back').style.display='none';var e=$('err');if(e)e.style.display='none';
+  var i=Math.floor(Math.random()*PAL.length),delay=55,result=null,failed=null,t0=Date.now(),tries=0,landing=0;
+  function show(h,k,n,s){var w=$('wheel');if(!w)return;w.style.background=h;w.style.color=k;$('wname').textContent=n;$('wsym').textContent=s}
+  function ask(){tries++;call({op:'spin',ua:navigator.userAgent.slice(0,120)}).then(function(r){
+    if(r&&r.ok&&r.view&&r.view.team){result=r.view;return}
+    var m=(r&&r.err)||'Try again.';
+    if((r&&r.reload)||/full|list|Not allowed|reload/i.test(m)||tries>=10){failed=m;return}
+    setTimeout(ask,1200+Math.random()*1500*tries)},function(){if(tries>=10){failed='No connection. Try again.';return}setTimeout(ask,1500*tries)})}
+  ask();
+  (function tick(){
+    if(failed){spinning=false;show('#e2dccf','#1d1d1b','Try again','?');var b=$('spinB');if(b){b.disabled=false;b.textContent='Spin'}showErr(failed);return}
+    if(result&&Date.now()-t0>2400){landing++;delay*=1.3;
+      if(landing>8){var tm=result.team;show(tm.col,tm.ink,tm.name,tm.sym);try{navigator.vibrate&&navigator.vibrate([70,50,180])}catch(x){}
+        setTimeout(function(){spinning=false;state=result;render();glow(tm)},750);return}
+    }else if(!result&&Date.now()-t0>6000)delay=110;
+    i=(i+1)%PAL.length;show(PAL[i][1],PAL[i][2],PAL[i][0],SUITS[i%4]);
+    setTimeout(tick,delay)})();
+}
+/* Take it with you: one clean page (printed to PDF on the phone) and the same as WhatsApp text. Nothing is sent to any server. */
+var MOVES=[['IDEO','30 ideas in 20 minutes, using the 7 brainstorm rules'],['Apple','One owner (DRI) per task, plus a "not doing" list'],['Samsung','Take a rival product apart; list 10 insights'],['3M','90 minutes a week on your own experiment; show it in 3 minutes'],['Google','A one-day sprint, tested with 5 real people'],['VNV','Show a sketch or model to 3 customers before you build']];
+var TOOLS=[['6C','Face a concern, find a cause, compare research, conceive, convince, continue. Communicate with the people affected at every step.'],['AEIOU','Watch Activities, Environment, Interactions, Objects, Users.'],["5 E's",'Entice, Enter, Engage, Exit, Extend. Where does your customer drop off?'],['L.I.F.E','Does your idea respect their Love, Identity, Freedom, Expression?'],['AI as a teammate','Give it your situation, make it ask first, make it argue, make it build the test, then check it with a person.']];
+function takeData(t){var c=t.card||{},hd=t.hand;return {hand:hd?[['The future',hd.future.k+': '+hd.future.t],['Your customer',hd.customer.t],['Your constraint',hd.constraint.t],['Steal from',hd.practice.k+': '+hd.practice.t]]:[],
+  card:BOXES.map(function(b){return [b.name,(c[b.f]||'').trim()]}),logs:(t.logs||[]).slice().reverse()}}
+function takeHtml(t){var d=takeData(t),e=esc,h='<h1>How the Best Innovate</h1><p class="sub">SFIMAR · 17 Oct 2026 · Nishit Kamath, The Next Hand</p>'+
+  '<span class="tm" style="background:'+e(t.col||'#1f5e47')+';color:'+e(t.ink||'#fff')+'">'+e(t.sym||'')+' '+e(t.name)+'</span>';
+  if(d.hand.length)h+='<h2>Your hand</h2><table>'+d.hand.map(function(r){return '<tr><td>'+e(r[0])+'</td><td>'+e(r[1])+'</td></tr>'}).join('')+'</table>';
+  h+='<h2>Your Experiment Card</h2><table>'+d.card.map(function(r){return '<tr><td>'+e(r[0])+'</td><td>'+(r[1]?e(r[1]):'<span style="color:#999">(not filled in)</span>')+'</td></tr>'}).join('')+'</table>';
+  if(d.logs.length)h+='<h2>Your proof log</h2><ul>'+d.logs.map(function(l){return '<li><b>'+e(new Date(l.ts).toLocaleDateString('en-IN',{day:'numeric',month:'short'}))+'</b> · tested: '+e(l.tested)+(l.learnt?' · learnt: '+e(l.learnt):'')+(l.sales||l.salesRs?' · '+l.sales+' sold, ₹'+l.salesRs:'')+'</li>'}).join('')+'</ul>';
+  h+='<h2>Your three moves</h2><ul><li><b>Steal one practice</b> (below) this week.</li><li><b>Run your experiment</b> before next Saturday.</li><li><b>Make one sale</b> before 6 Nov, so you have proof on 27 Nov.</li></ul>';
+  h+='<h2>Six practices to steal</h2><ul>'+MOVES.map(function(m){return '<li><b>'+e(m[0])+':</b> '+e(m[1])+'</li>'}).join('')+'</ul>';
+  h+='<h2>Tools from today</h2><ul>'+TOOLS.map(function(m){return '<li><b>'+e(m[0])+':</b> '+e(m[1])+'</li>'}).join('')+'</ul>';
+  h+='<p class="foot">Log your proof every week at '+e(SHORT_LINK)+' · Questions: Nishit Kamath on LinkedIn (linkedin.com/in/nishitkamath)</p>';
+  var x=$('take');if(!x){x=document.createElement('div');x.id='take';document.body.appendChild(x)}x.innerHTML=h}
+function takeText(t){var d=takeData(t),L=['*How the Best Innovate* · SFIMAR 17 Oct 2026','Team: '+t.name,''];
+  if(d.hand.length){L.push('*Our hand*');d.hand.forEach(function(r){L.push('• '+r[0]+': '+r[1])});L.push('')}
+  L.push('*Our Experiment Card*');d.card.forEach(function(r){L.push('• '+r[0]+': '+(r[1]||'—'))});L.push('');
+  L.push('*This week*: steal one practice · run the experiment · first sale before 6 Nov · proof on 27 Nov');L.push('');
+  L.push('*Six practices*');MOVES.forEach(function(m){L.push('• '+m[0]+': '+m[1])});L.push('');
+  L.push('Proof log: https://'+SHORT_LINK);return L.join('\n').slice(0,3500)}
+/* Glow: the whole screen turns the team colour so teammates can find each other across the room. */
+function glow(t){
+  var g=$('glow');g.style.background=t.col||'#1f5e47';g.style.color=t.ink||'#fff';
+  g.innerHTML='<div><div class="gs">'+esc(t.sym||'●')+'</div><div class="gk">Your team</div><div class="gn">'+esc(t.name)+'</div><p>Hold your phone up high.<br>Find the other <b>'+esc(t.name)+'</b> screens<br>and sit together.</p><button class="gb" id="gOk">Found them ✓</button></div>';
+  g.classList.add('on');document.body.style.overflow='hidden';
+  try{if(navigator.wakeLock)navigator.wakeLock.request('screen').then(function(l){wl=l},function(){})}catch(x){}
+  $('gOk').onclick=function(){g.classList.remove('on');document.body.style.overflow='';try{if(wl)wl.release();wl=null}catch(x){}};
 }
 function setSt(t,c){var s=$('st');if(s){s.textContent=t;s.className='status '+(c||'')}}
 function saveField(f){
@@ -201,12 +318,13 @@ function showErr(m){var e=$('err');if(e){e.textContent=m;e.style.display='block'
 function confirmJoin(req,name){
   var s=$('sheet');$('sheetIn').innerHTML='<h2 style="margin:0 0 6px">Join '+esc(name)+'?</h2><p class="hint">This phone will stay with this team.</p><button class="btn" id="yes">Join '+esc(name)+'</button><div style="height:8px"></div><button class="btn ghost" id="no">Back</button>';
   s.classList.add('on');$('no').onclick=function(){s.classList.remove('on')};
-  $('yes').onclick=function(){this.disabled=true;this.textContent='Joining…';req.op='join';call(req).then(function(r){s.classList.remove('on');if(!r.ok){showErr(r.err);return}state=r.view;render()},function(){s.classList.remove('on');showErr('No connection. Try again.')})};
+  $('yes').onclick=function(){this.disabled=true;this.textContent='Joining…';req.op='join';call(req).then(function(r){s.classList.remove('on');if(!r.ok){showErr(r.err);return}state=r.view;render();if(r.view.team)glow(r.view.team)},function(){s.classList.remove('on');showErr('No connection. Try again.')})};
 }
 /* merge a fresh server view without disturbing what the person is typing */
 function mergeStudent(v){
+  if(spinning)return;
   var focused=document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.f;
-  var changedShape=!state||!state.team!==!v.team||(state.stage!==v.stage)||(state.team&&v.team&&(!state.team.hand!==!v.team.hand||state.team.logs.length!==v.team.logs.length||state.team.redealsLeft!==v.team.redealsLeft||state.team.members!==v.team.members))||(!v.team&&JSON.stringify(state.teams)!==JSON.stringify(v.teams));
+  var changedShape=!state||!state.team!==!v.team||(state.stage!==v.stage)||(state.team&&v.team&&(!state.team.hand!==!v.team.hand||state.team.logs.length!==v.team.logs.length||state.team.redealsLeft!==v.team.redealsLeft||state.team.members!==v.team.members))||(!v.team&&JSON.stringify(state.teams)!==JSON.stringify(v.teams))||JSON.stringify(state.cfg)!==JSON.stringify(v.cfg)||(state.team&&v.team&&state.team.name!==v.team.name);
   var typingElsewhere=document.activeElement&&/lT|lL|lC|lS|lR|newName/.test(document.activeElement.id||'');
   if(changedShape&&!focused&&!typingElsewhere&&!Object.keys(dirty).some(function(k){return dirty[k]})){state=v;render();return}
   state=v;
@@ -221,11 +339,18 @@ function renderHost(){
   '<div class="qr" style="margin-top:14px"><div id="qrBox"></div><div class="link">'+esc(SHORT_LINK)+'</div></div>'+
   '<div class="nums"><div class="num"><b>'+v.teams.length+'</b><span>teams</span></div><div class="num"><b>'+v.phones+'</b><span>phones</span></div><div class="num"><b>'+v.filled+'</b><span>boxes filled</span></div></div></div><div>'+
   '<div class="stages">'+[['join','1 · Join'],['hand','2 · Hand'],['card','3 · Experiment Card'],['after','4 · Proof log']].map(function(s){return '<button data-st="'+s[0]+'" class="'+(v.stage==s[0]?'on':'')+'">'+s[1]+'</button>'}).join('')+'<button id="dealall" style="margin-left:auto">Deal all hands</button></div>';
+  if(v.stage==='join'){var cf=v.cfg||{mode:'both',lock:false,max:8,n:2},sp=v.spin||{teams:0,smallest:0,largest:0};
+    h+='<div class="tctl"><span>Phones show: <span class="seg">'+[['both','Both'],['spin','Spin only'],['own','Own teams only']].map(function(m){return '<button data-mode="'+m[0]+'" class="'+(cf.mode==m[0]?'on':'')+'">'+m[1]+'</button>'}).join('')+'</span></span>'+
+    '<span class="stp">Colour teams <button data-n="-1">−</button><b>'+cf.n+'</b><button data-n="1">+</button></span>'+
+    '<span class="stp">Max per team <button data-mx="-1">−</button><b>'+cf.max+'</b><button data-mx="1">+</button></span>'+
+    '<button class="lk'+(cf.lock?' on':'')+'" id="lk">'+(cf.lock?'Team list locked':'Lock team list')+'</button>'+
+    '<span class="st">'+(sp.teams?sp.teams+' colour teams · smallest '+sp.smallest+' · largest '+sp.largest:'Colour teams are for people without a team. They are made on the first spin (or press + / −). Everyone spinning? Set about people ÷ 6.5.')+'</span></div>';
+  }
   if(v.stage==='join')h+='<div class="addt"><textarea id="addT" placeholder="Add teams in advance: one name per line (e.g. from the class list)">'+esc(addDraft)+'</textarea><button id="addTb">Add teams</button></div>';
   if(!v.teams.length)h+='<div class="empty">No teams yet. Ask everyone to scan the code.</div>';
   h+='<div class="tiles">';
   v.teams.forEach(function(t){
-    h+='<div class="tile" data-t="'+esc(t.id)+'"><h3>'+esc(t.name)+'</h3><div class="m">'+t.members+' phone'+(t.members==1?'':'s')+(t.logs.length?' · '+t.logs.length+' log':'')+'</div>';
+    h+='<div class="tile" data-t="'+esc(t.id)+'" style="--tc:'+esc(t.col||'#e2dccf')+'"><h3><span class="sy">'+esc(t.sym||'')+'</span> '+esc(t.name)+'</h3><div class="m">'+t.members+' phone'+(t.members==1?'':'s')+(t.logs.length?' · '+t.logs.length+' log':'')+'</div>';
     if(t.hand)h+='<div class="mini"><div>🔮 '+esc(t.hand.future.t)+'</div><div>👤 '+esc(t.hand.customer.t)+'</div><div>⛓ '+esc(t.hand.constraint.t)+'</div><div>✋ '+esc(t.hand.practice.k)+'</div></div>';
     else h+='<div class="mini" style="color:var(--mute)">No hand dealt yet</div>';
     h+='<div class="score">'+BOXES.map(function(b){return '<span class="'+((t.card[b.f]||'').trim()?'on':'')+'">'+b.f+'</span>'}).join('')+'</div></div>';
@@ -234,6 +359,10 @@ function renderHost(){
   if($('qrBox'))$('qrBox').appendChild(qrEl());
   $('app').querySelectorAll('[data-st]').forEach(function(b){b.onclick=function(){hostAct({op:'stage',stage:b.dataset.st})}});
   $('dealall').onclick=function(){hostAct({op:'dealall'})};
+  $('app').querySelectorAll('[data-mode]').forEach(function(b){b.onclick=function(){hostAct({op:'cfg',mode:b.dataset.mode})}});
+  $('app').querySelectorAll('[data-n]').forEach(function(b){b.onclick=function(){hostAct({op:'cfg',n:state.cfg.n+Number(b.dataset.n),make:true})}});
+  $('app').querySelectorAll('[data-mx]').forEach(function(b){b.onclick=function(){hostAct({op:'cfg',max:state.cfg.max+Number(b.dataset.mx)})}});
+  if($('lk'))$('lk').onclick=function(){hostAct({op:'cfg',lock:!state.cfg.lock})};
   if($('addT')){$('addT').oninput=function(){addDraft=this.value};$('addTb').onclick=function(){var n=addDraft.split(/\n+/).map(function(x){return x.trim()}).filter(Boolean);if(!n.length)return;addDraft='';hostAct({op:'addteams',names:n})}}
   $('app').querySelectorAll('[data-t]').forEach(function(el){el.onclick=function(){openTeam=el.dataset.t;renderOv()}});
   renderOv();
@@ -245,12 +374,14 @@ function renderOv(){
   if(t.hand)h+='<div class="hc f"><small>The future · '+esc(t.hand.future.k)+'</small>'+esc(t.hand.future.t)+'</div><div class="hc c"><small>Customer</small>'+esc(t.hand.customer.t)+'</div><div class="hc k"><small>Constraint</small>'+esc(t.hand.constraint.t)+'</div><div class="hc p"><small>Steal from · '+esc(t.hand.practice.k)+'</small>'+esc(t.hand.practice.t)+'</div>'+'<button class="btn ghost small" id="rd">Re-deal this team</button>';
   else h+='<p class="sub">No hand yet.</p>';
   if(!t.members)h+='<button class="btn ghost small" id="rmT">Remove this team (no phones yet)</button>';
+  h+='<div class="rn"><input type="text" id="renameIn" maxlength="40" value="'+esc(t.name)+'"><button class="btn small" id="rnB">Rename</button></div>';
   h+='</div><div>';
   BOXES.forEach(function(b){h+='<div class="f2"><b>'+b.f+' · '+b.name+' · '+b.step+'</b><div>'+(esc(t.card[b.f])||'<span style="color:#aaa294">—</span>')+'</div></div>'});
   (t.logs||[]).forEach(function(l){h+='<div class="entry"><b>'+esc(new Date(l.ts).toLocaleDateString('en-IN',{day:'numeric',month:'short'}))+' · '+l.sales+' sold · ₹'+l.salesRs+'</b><div>'+esc(l.tested)+' → '+esc(l.learnt)+'</div></div>'});
   $('ovIn').innerHTML=h+'</div></div>';o.classList.add('on');
   $('cl').onclick=function(){openTeam=null;renderOv()};
   if($('rd'))$('rd').onclick=function(){hostAct({op:'redeal',teamId:t.id})};
+  $('rnB').onclick=function(){var n=$('renameIn').value.trim();if(n&&n!==t.name)hostAct({op:'rename',teamId:t.id,name:n})};
   if($('rmT'))$('rmT').onclick=function(){openTeam=null;renderOv();hostAct({op:'delteam',teamId:t.id})};
 }
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&openTeam){openTeam=null;renderOv()}});
@@ -262,7 +393,7 @@ function poll(){
   var req=BOOT.mode==='host'?{op:'board'}:{op:'state'};
   call(req).then(function(r){
     if(!r.ok){if(!state){$('app').innerHTML='<div class="wrap"><div class="brand"><i></i>The Next Hand · Live</div><div class="panel">'+esc(r.err)+'</div></div>'}return}
-    if(BOOT.mode==='host'){state=r.view;if(!(document.activeElement&&document.activeElement.id==='addT'))render()}else{if(!state){state=r.view;render()}else mergeStudent(r.view)}
+    if(BOOT.mode==='host'){state=r.view;if(!(document.activeElement&&/^(addT|renameIn)$/.test(document.activeElement.id)))render()}else{if(!state){state=r.view;render()}else mergeStudent(r.view)}
   },function(){}).then(function(){setTimeout(poll,(BOOT.mode==='host'?3000:5000)+Math.random()*1500)});
 }
 if(!BOOT.event){$('app').innerHTML='<div class="wrap"><div class="brand"><i></i>The Next Hand · Live</div><div class="panel">Open the link your speaker shared.</div></div>'}
