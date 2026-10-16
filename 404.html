@@ -58,6 +58,7 @@ textarea{min-height:84px;resize:vertical}
 .err{background:var(--red2);color:var(--red);border-radius:10px;padding:10px 12px;font-size:14px;margin-top:12px;display:none}
 /* ---------- teams: choice, spin, glow ---------- */
 .btn.spin{background:#1f4fd1}
+.arm{background:#b33a2e!important;color:#fff!important;border-color:#b33a2e!important}
 .linkb{background:none;border:0;color:var(--green);font-weight:600;padding:12px 0 0;cursor:pointer;font-size:14px}
 .team i{width:12px;height:12px;border-radius:50%;display:inline-block;margin-right:8px;vertical-align:-1px}
 .wheel{height:220px;border-radius:22px;margin:4px 0 14px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#e2dccf;color:#1d1d1b;transition:background .06s;box-shadow:inset 0 0 0 6px rgba(255,255,255,.35)}
@@ -133,6 +134,8 @@ body.host{font-size:18px;background:#efe9dd}
 .ov .grid{display:grid;grid-template-columns:1fr 1.5fr;gap:26px;margin-top:16px}
 .ov .hc{font-size:18px}
 .fillin{margin:10px 0 12px;padding:10px 12px;border:1.5px dashed var(--green);border-radius:12px;font-weight:600;background:var(--card)}
+.fillin .hbx{display:block;width:100%;box-sizing:border-box;margin:6px 0;font:inherit;font-weight:500;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;color:inherit}
+.fillin .hbn{display:block;font-weight:400;font-size:12.5px;color:var(--muted);margin-top:6px}
 .addt{display:flex;gap:10px;align-items:flex-start;margin:0 0 14px}
 .addt textarea{flex:1;min-height:64px;font:inherit;font-size:15px;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink)}
 .addt button{white-space:nowrap}
@@ -336,12 +339,12 @@ function renderStudent(){
     h+='<div class="panel"><h2>Your hand</h2>';
     if(!showHand){h+='<p class="hint">Four cards: a future, a customer, a constraint and a company practice. One person taps, the whole team sees it.</p><button class="btn" id="deal">Deal our hand</button>'}
     else{
-      h+='<p class="hint">5 minutes: re-play your idea with this hand. What do you keep, drop or add?</p><div class="fillin">With this hand, our idea becomes ____ for ____.</div><div class="hand">'+
+      h+='<p class="hint">5 minutes: re-play your idea with this hand. What do you keep, drop or add?</p>'+handLine(t)+'<div class="hand">'+
       '<div class="hc f"><small>The future · '+esc(t.hand.future.k)+'</small>'+esc(t.hand.future.t)+'</div>'+
       '<div class="hc c"><small>Your customer</small>'+esc(t.hand.customer.t)+'</div>'+
       '<div class="hc k"><small>Your constraint</small>'+esc(t.hand.constraint.t)+'</div>'+
       '<div class="hc p"><small>Steal from · '+esc(t.hand.practice.k)+'</small>'+esc(t.hand.practice.t)+'</div></div>';
-      if(t.redealsLeft>0&&!stageAt('card')&&NET.ok&&!OB().length)h+='<div style="margin-top:12px"><button class="btn ghost small" id="redeal">Deal again (1 left)</button></div>';
+      if(t.redealsLeft>0&&!stageAt('card')&&NET.ok&&!OB().length)h+='<div style="margin-top:12px"><button class="btn ghost small" id="redeal">Deal again (1 left)</button><p class="hint" style="margin:6px 0 0;font-size:12.5px">⚠ Agree as a team first: it changes the hand on every teammate\'s phone. Two taps to confirm.</p></div>';
     }
     h+='</div>';
   }
@@ -365,11 +368,12 @@ function renderStudent(){
   h+='<div class="panel takep"><h2>Take it with you</h2><p class="hint">Your hand, your Experiment Card, your log and the six moves from today, on one page. Save it, or send it to yourself on WhatsApp.</p><a class="btn ghost" id="notesB" href="notes.pdf" target="_blank" rel="noopener" style="margin-bottom:10px;text-decoration:none">Today\'s notes and toolkit (PDF)</a><div class="row2"><button class="btn" id="pdfB">Save as PDF</button><button class="btn wa" id="waB">Send to my WhatsApp</button></div><p class="hint" style="margin:8px 0 0;font-size:12.5px">PDF: in the print screen choose "Save as PDF" (iPhone: Share, then Save to Files). WhatsApp: pick "Message yourself".</p></div>';
   a.innerHTML=h+'</div>';
   if($('chipG'))$('chipG').onclick=function(){glow(t)};
+  ['hb1','hb2'].forEach(function(id){var el=$(id);if(!el)return;el.oninput=function(){dirty.O=1;clearTimeout(hlT);hlT=setTimeout(saveHand,1200)};el.onchange=function(){clearTimeout(hlT);if(dirty.O)saveHand()}});
   if($('leaveB'))$('leaveB').onclick=function(){leaving=true;render();window.scrollTo(0,0)};
   if($('pdfB'))$('pdfB').onclick=function(){takeHtml(t);setTimeout(function(){window.print()},60)};
   if($('waB'))$('waB').onclick=function(){location.href='https://wa.me/?text='+encodeURIComponent(takeText(t))};
   if($('deal'))$('deal').onclick=function(){store(okey('rev'),'1');if(state.team&&state.team.hand){render();send({op:'deal'});return}this.disabled=true;this.textContent='Dealing…';act({op:'deal'})};
-  if($('redeal'))$('redeal').onclick=function(){this.disabled=true;act({op:'redeal'})};
+  tap2('redeal','redeal','Deal again (1 left)','Tap again: a new hand for your whole team',function(){var b=$('redeal');if(b)b.disabled=true;act({op:'redeal'})});
   if(stageAt('card'))BOXES.forEach(function(b){var el=$('f'+b.f);el.value=t.card[b.f]||'';el.oninput=function(){dirty[b.f]=1;setSt('Typing…','');clearTimeout(timers[b.f]);timers[b.f]=setTimeout(function(){saveField(b.f)},1200)};el.onblur=function(){if(dirty[b.f]){clearTimeout(timers[b.f]);saveField(b.f)}}});
   if($('addLog'))$('addLog').onclick=function(){var b=this;b.disabled=true;act({op:'log',entry:{tested:$('lT').value,learnt:$('lL').value,changed:$('lC').value,sales:$('lS').value,salesRs:$('lR').value}},function(){b.disabled=false})};
 }
@@ -433,6 +437,22 @@ function glow(t,note){
   $('gOk').onclick=function(){g.classList.remove('on');document.body.style.overflow='';try{if(wl)wl.release();wl=null}catch(x){}};
 }
 function setSt(t,c){var s=$('st');if(s){s.textContent=t;s.className='status '+(c||'')}}
+/* the hand's fill-in line: two blanks, saved for the whole team as the Experiment Card's "Our idea" (O) */
+function splitO(o){o=String(o||'');var i=o.lastIndexOf(' for ');return i<0?[o,'']:[o.slice(0,i),o.slice(i+5)]}
+function handLine(t){var o=(t.card&&t.card.O)||'';
+  if(stageAt('card'))return '<div class="fillin">With this hand, our idea becomes '+(o?esc(o):'____ for ____')+'.</div>';
+  var sp=splitO(o);
+  return '<div class="fillin">With this hand, our idea becomes<input id="hb1" class="hbx" maxlength="300" autocomplete="off" placeholder="your idea, re-played" value="'+esc(sp[0])+'">for<input id="hb2" class="hbx" maxlength="160" autocomplete="off" placeholder="who it\'s for" value="'+esc(sp[1])+'"><div class="status" id="st"></div><small class="hbn">Saved for your whole team. It becomes \"Opportunity: our idea\" on your Experiment Card.</small></div>'}
+var hlT=null;
+function handVal(){var a=(($('hb1')||{}).value||'').trim(),b=(($('hb2')||{}).value||'').trim();return a||b?a+' for '+b:''}
+function saveHand(){var val=handVal();dirty.O=0;saving.O=val;setSt('Saving…','');
+  send({op:'save',field:'O',value:val}).then(function(r){
+    if(saving.O===val)delete saving.O;
+    if(r&&r.queued){setSt('Saved on this phone ✓ · sends when online','ok');return}
+    if(!r.ok){dirty.O=1;setSt(r.err||'Not saved, retrying…','warn');if(!r.reload)setTimeout(saveHand,4000);return}
+    state=r.view;setSt('Saved ✓','ok');
+  },function(){dirty.O=1;setSt('No connection. Will retry…','warn');setTimeout(saveHand,5000)});
+}
 function saveField(f){
   var el=$('f'+f);if(!el)return;var val=el.value;dirty[f]=0;saving[f]=val;setSt('Saving…','');
   send({op:'save',field:f,value:val}).then(function(r){
@@ -453,6 +473,13 @@ function doLeave(){
     leaving=false;choice=null;store(okey('rev'),'0');state=r.view;keepState();render();
   },function(){y.disabled=false;y.textContent='Yes, leave this team';showErr('Changing team needs signal. Try again when you are online.')});
 }
+/* two taps for anything that is hard to undo: the first tap arms the button (red, says what will happen), a second tap within 4 s does it.
+   Kept outside the DOM so the board's 3-second refresh cannot disarm it mid-way. */
+var ARM={};
+function armed(k){return ARM[k]&&Date.now()-ARM[k]<4000}
+function tap2(id,k,label,msg,fn){var el=$(id);if(!el)return;if(armed(k)){el.textContent=msg;el.classList.add('arm')}
+  el.onclick=function(){if(armed(k)){delete ARM[k];fn();return}ARM[k]=Date.now();el.textContent=msg;el.classList.add('arm');
+    setTimeout(function(){if(!armed(k)){var e=$(id);if(e){e.textContent=label;e.classList.remove('arm')}}},4100)}}
 function showErr(m){var e=$('err');if(e){e.textContent=m;e.style.display='block'}else alert(m)}
 function confirmJoin(req,name){
   var s=$('sheet');$('sheetIn').innerHTML='<h2 style="margin:0 0 6px">Join '+esc(name)+'?</h2><p class="hint">This phone will stay with this team.</p><button class="btn" id="yes">Join '+esc(name)+'</button><div style="height:8px"></div><button class="btn ghost" id="no">Back</button>';
@@ -464,10 +491,13 @@ function mergeStudent(v){
   if(spinning)return;
   var focused=document.activeElement&&document.activeElement.dataset&&document.activeElement.dataset.f;
   var changedShape=!state||!state.team!==!v.team||(state.stage!==v.stage)||(state.team&&v.team&&(!state.team.hand!==!v.team.hand||state.team.logs.length!==v.team.logs.length||state.team.redealsLeft!==v.team.redealsLeft||state.team.members!==v.team.members))||(!v.team&&JSON.stringify(state.teams)!==JSON.stringify(v.teams))||JSON.stringify(state.cfg)!==JSON.stringify(v.cfg)||(state.team&&v.team&&state.team.name!==v.team.name);
-  var typingElsewhere=document.activeElement&&/lT|lL|lC|lS|lR|newName/.test(document.activeElement.id||'');
+  var typingElsewhere=document.activeElement&&/lT|lL|lC|lS|lR|newName|hb1|hb2/.test(document.activeElement.id||'');
   if(state&&state.team&&v.team&&state.team.id!==v.team.id){state=v;render();glow(v.team,'You\'ve moved: evening out the spare teams');return}   // moved to even out the spare teams
+  // the speaker moved on while someone was still in the hand's blanks: send what they typed, then follow the stage
+  if(state&&state.stage!==v.stage&&document.activeElement&&/^hb[12]$/.test(document.activeElement.id||'')){clearTimeout(hlT);if(dirty.O)saveHand();document.activeElement.blur();state=v;render();return}
   if(changedShape&&!focused&&!typingElsewhere&&!Object.keys(dirty).some(function(k){return dirty[k]})){state=v;render();return}
   state=v;
+  if(v.team&&!stageAt('card')&&$('hb1')&&!dirty.O&&saving.O===undefined){var sp=splitO(v.team.card.O);[['hb1',0],['hb2',1]].forEach(function(q){var el=$(q[0]);if(el&&document.activeElement!==el&&el.value!==sp[q[1]])el.value=sp[q[1]]})}
   if(v.team&&stageAt('card'))BOXES.forEach(function(b){var el=$('f'+b.f);if(el&&b.f!==focused&&!dirty[b.f]&&saving[b.f]===undefined&&el.value!==(v.team.card[b.f]||''))el.value=v.team.card[b.f]||''});
 }
 
@@ -498,7 +528,7 @@ function renderHost(){
   $('app').innerHTML=h+'</div></div></div>';
   if($('qrBox'))$('qrBox').appendChild(qrEl());
   $('app').querySelectorAll('[data-st]').forEach(function(b){b.onclick=function(){hostAct({op:'stage',stage:b.dataset.st})}});
-  $('dealall').onclick=function(){hostAct({op:'dealall'})};
+  tap2('dealall','dealall','Deal all hands','Tap again: deal every team that has no hand yet',function(){hostAct({op:'dealall'})});
   $('app').querySelectorAll('[data-mode]').forEach(function(b){b.onclick=function(){hostAct({op:'cfg',mode:b.dataset.mode})}});
   $('app').querySelectorAll('[data-n]').forEach(function(b){b.onclick=function(){hostAct({op:'cfg',n:state.cfg.n+Number(b.dataset.n),make:true})}});
   $('app').querySelectorAll('[data-mx]').forEach(function(b){b.onclick=function(){hostAct({op:'cfg',max:state.cfg.max+Number(b.dataset.mx)})}});
@@ -511,7 +541,7 @@ function renderOv(){
   var o=$('ov');if(!openTeam){o.classList.remove('on');return}
   var t=state.teams.filter(function(x){return x.id===openTeam})[0];if(!t){openTeam=null;o.classList.remove('on');return}
   var h='<button class="btn ghost small close" id="cl">Close (Esc)</button><h2>'+esc(t.name)+'</h2><div class="sub">'+t.members+' phones</div><div class="grid"><div class="hand">';
-  if(t.hand)h+='<div class="hc f"><small>The future · '+esc(t.hand.future.k)+'</small>'+esc(t.hand.future.t)+'</div><div class="hc c"><small>Customer</small>'+esc(t.hand.customer.t)+'</div><div class="hc k"><small>Constraint</small>'+esc(t.hand.constraint.t)+'</div><div class="hc p"><small>Steal from · '+esc(t.hand.practice.k)+'</small>'+esc(t.hand.practice.t)+'</div>'+'<button class="btn ghost small" id="rd">Re-deal this team</button>';
+  if(t.hand)h+='<div class="hc f"><small>The future · '+esc(t.hand.future.k)+'</small>'+esc(t.hand.future.t)+'</div><div class="hc c"><small>Customer</small>'+esc(t.hand.customer.t)+'</div><div class="hc k"><small>Constraint</small>'+esc(t.hand.constraint.t)+'</div><div class="hc p"><small>Steal from · '+esc(t.hand.practice.k)+'</small>'+esc(t.hand.practice.t)+'</div>'+'<button class="btn ghost small" id="rd">Re-deal this team</button>'+(t.redealsLeft>0?'<span class="sub" style="margin-left:8px">Their own Deal again: 1 left</span>':'<button class="btn ghost small" id="rf" style="margin-left:8px">+1 deal (give their Deal again back)</button>');
   else h+='<p class="sub">No hand yet.</p>';
   if(!t.members)h+='<button class="btn ghost small" id="rmT">Remove this team (no phones yet)</button>';
   h+='<div class="rn"><input type="text" id="renameIn" maxlength="40" value="'+esc(t.name)+'"><button class="btn small" id="rnB">Rename</button></div>';
@@ -520,9 +550,10 @@ function renderOv(){
   (t.logs||[]).forEach(function(l){h+='<div class="entry"><b>'+esc(new Date(l.ts).toLocaleDateString('en-IN',{day:'numeric',month:'short'}))+' · '+l.sales+' sold · ₹'+l.salesRs+'</b><div>'+esc(l.tested)+' → '+esc(l.learnt)+'</div></div>'});
   $('ovIn').innerHTML=h+'</div></div>';o.classList.add('on');
   $('cl').onclick=function(){openTeam=null;renderOv()};
-  if($('rd'))$('rd').onclick=function(){hostAct({op:'redeal',teamId:t.id})};
+  tap2('rd','rd'+t.id,'Re-deal this team','Tap again: replaces this team\'s hand on every phone',function(){hostAct({op:'redeal',teamId:t.id})});
+  if($('rf'))$('rf').onclick=function(){hostAct({op:'refill',teamId:t.id})};
   $('rnB').onclick=function(){var n=$('renameIn').value.trim();if(n&&n!==t.name)hostAct({op:'rename',teamId:t.id,name:n})};
-  if($('rmT'))$('rmT').onclick=function(){openTeam=null;renderOv();hostAct({op:'delteam',teamId:t.id})};
+  tap2('rmT','rm'+t.id,'Remove this team (no phones yet)','Tap again to remove this team',function(){openTeam=null;renderOv();hostAct({op:'delteam',teamId:t.id})});
 }
 document.addEventListener('keydown',function(e){if(e.key==='Escape'&&openTeam){openTeam=null;renderOv()}});
 function hostAct(req){call(req).then(function(r){if(r.ok){state=r.view;render()}else if(r.err)alert(r.err)},function(){})}
