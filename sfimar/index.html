@@ -137,6 +137,7 @@ body.host{font-size:18px;background:#efe9dd}
 .close{float:right}
 @media (max-width:820px){.board{grid-template-columns:1fr}.side{position:static}.ov .grid{grid-template-columns:1fr}}
 /* offline: everything saves on the phone and sends itself when the network is back */
+.consent ul{margin:0 0 14px;padding-left:18px;font-size:14px}.consent li{margin:6px 0}
 #net{position:fixed;left:10px;right:10px;bottom:10px;z-index:40;display:none;align-items:center;gap:10px;flex-wrap:wrap;background:#1d1d1b;color:#fff;border-radius:14px;padding:10px 14px;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
 #net.on{display:flex}#net.ok{background:var(--green)}#net b{font-weight:650}#net span{flex:1;min-width:180px}
 #net button{border:0;border-radius:10px;padding:8px 12px;background:#fff;color:#1d1d1b;font-weight:650;cursor:pointer}
@@ -261,6 +262,21 @@ function stageAt(s){var a=ORDER.indexOf(state&&state.stage||'join'),b=ORDER.inde
 function renderStudent(){
   var v=state, a=$('app'), t=v.team;
   var h='<div class="wrap"><div class="brand"><i></i>The Next Hand · Live</div><h1>'+esc(v.title)+'</h1>';
+  /* consent first: plain words on what is kept, why, for how long, and how to say no (shown once per phone, works offline) */
+  if(!t&&store(okey('ok'))!=='1'){
+    h+='<div class="panel consent"><h2>Before you join</h2><p class="hint">This app runs today\'s team activity and your InnoHatch proof log. Please read this first.</p>'+
+      '<ul><li><b>What it keeps:</b> your team choice, and what your team types in the Experiment Card and proof log. Plus a random code for this phone, so it stays with your team.</li>'+
+      '<li><b>What it never asks for:</b> your name, phone number or email. Please don\'t type personal details about yourself or anyone else.</li>'+
+      '<li><b>Who sees it:</b> your team, and the speaker, Nishit Kamath (The Next Hand). He may share anonymous highlights with SFIMAR faculty.</li>'+
+      '<li><b>Where and how long:</b> on Google\'s servers, until 31 Dec 2026, then deleted. To have your team\'s entries deleted sooner, message Nishit Kamath on LinkedIn.</li>'+
+      '<li><b>It\'s optional:</b> you can take part on paper with your team instead. If you are under 18, please do that.</li>'+
+      '<li><b>As is:</b> a free classroom tool, provided as is. The cards and notes are prompts for learning, not professional advice.</li></ul>'+
+      '<button class="btn" id="agree">I\'m 18 or older and I agree</button><div style="height:8px"></div><button class="btn ghost" id="noThanks">No thanks, I\'ll use paper</button></div>';
+    a.innerHTML=h+'</div>';
+    $('agree').onclick=function(){store(okey('ok'),'1');store(okey('okAt'),new Date().toISOString());render()};
+    $('noThanks').onclick=function(){a.innerHTML='<div class="wrap"><div class="brand"><i></i>The Next Hand · Live</div><div class="panel"><h2>That\'s fine</h2><p class="hint">Join your team on paper. Everything you need is on the speaker\'s screen. Changed your mind? Reload this page.</p></div></div>'};
+    return;
+  }
   if(!t){
     var cf=v.cfg||{mode:'both',lock:false}, mode=cf.mode==='spin'?'spin':cf.mode==='own'?'own':(choice||'ask');
     if(mode==='ask'){
