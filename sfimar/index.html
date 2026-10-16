@@ -5,7 +5,6 @@
 <meta charset="utf-8">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; connect-src https://script.google.com https://script.googleusercontent.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
-
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Next Hand · Live</title>
 <style>
@@ -137,6 +136,11 @@ body.host{font-size:18px;background:#efe9dd}
 .ov .f2 div{font-size:21px;line-height:1.35;white-space:pre-wrap}
 .close{float:right}
 @media (max-width:820px){.board{grid-template-columns:1fr}.side{position:static}.ov .grid{grid-template-columns:1fr}}
+/* offline: everything saves on the phone and sends itself when the network is back */
+#net{position:fixed;left:10px;right:10px;bottom:10px;z-index:40;display:none;align-items:center;gap:10px;flex-wrap:wrap;background:#1d1d1b;color:#fff;border-radius:14px;padding:10px 14px;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+#net.on{display:flex}#net.ok{background:var(--green)}#net b{font-weight:650}#net span{flex:1;min-width:180px}
+#net button{border:0;border-radius:10px;padding:8px 12px;background:#fff;color:#1d1d1b;font-weight:650;cursor:pointer}
+@media print{#net{display:none!important}}
 </style>
 </head>
 <body>
@@ -144,10 +148,12 @@ body.host{font-size:18px;background:#efe9dd}
 <div class="sheet" id="sheet"><div class="in" id="sheetIn"></div></div>
 <div class="ov" id="ov"><div class="in" id="ovIn"></div></div>
 <div id="glow" role="dialog" aria-live="assertive"></div>
+<div id="net" role="status" aria-live="polite"></div>
 <script>
 var EXEC = "https://script.google.com/macros/s/AKfycbzaIpTuwXEhgD6Y1fvxEP8tJhvtyHaKcY07zGcKBELmz-fpGlUr7x7hpA9WXbAo47tMUQ/exec";
 var BOOT = (function(){var q=new URLSearchParams(location.search).get('p');var parts=location.pathname.split('/').filter(Boolean);var p=String(q||parts[parts.length-1]||'').replace(/\.html$/,'').replace(/^\/+|\/+$/g,'').toLowerCase();if(p==='index')p='';var m=p.match(/^([a-z0-9-]+?)-host-([a-z0-9]+)$/);var ev=m?m[1]:p;if(!/^[a-z0-9-]{0,40}$/.test(ev))ev='';return {mode:m?'host':'student',event:ev,key:m?m[2]:'',t:''}})();
 var SHORT_LINK = "live.thenexthand.com/sfimar", qrNode = null;
+var OFFLINE = {"title": "SFIMAR · How the Best Innovate · 17 Oct 2026", "teams": [{"id": "tt8gxzqyf3", "name": "B1 · Sole Strap", "col": "#1f4fd1", "ink": "#fff", "sym": "♠", "hand": {"future": {"k": "Rules", "t": "Every product must show who made it and where."}, "customer": {"t": "A retired teacher who's new to UPI"}, "constraint": {"t": "Total budget: ₹500"}, "practice": {"k": "IDEO", "t": "Pin up the 7 rules. Write one \"How might we…?\" and get 30 ideas in 20 minutes."}}}, {"id": "tba1633yo5", "name": "B2 · Vanora", "col": "#c8102e", "ink": "#fff", "sym": "♠", "hand": {"future": {"k": "Economy", "t": "Prices rise 20% in a year. People buy smaller packs, more often."}, "customer": {"t": "The college canteen manager"}, "constraint": {"t": "It must work without a smartphone"}, "practice": {"k": "Apple", "t": "Give every task one name (a DRI), and write a \"not doing\" list."}}}, {"id": "takyhb0yt9", "name": "B3 · Coconut-shell Pen Stand", "col": "#0f9d58", "ink": "#fff", "sym": "♠", "hand": {"future": {"k": "Energy", "t": "Rooftop solar everywhere: daytime power is almost free, evenings cost double."}, "customer": {"t": "A working mother with a 2-hour commute"}, "constraint": {"t": "No plastic, anywhere"}, "practice": {"k": "Samsung", "t": "Run a teardown: take a rival product apart as a mixed team and list 10 insights on value and cost."}}}, {"id": "tm36qmxyyp", "name": "B4 · Tapscore", "col": "#ffb300", "ink": "#1d1d1b", "sym": "♠", "hand": {"future": {"k": "Rules", "t": "Customer data must be deleted after 30 days."}, "customer": {"t": "A small shop owner in your neighbourhood"}, "constraint": {"t": "You have 48 hours"}, "practice": {"k": "Google", "t": "Run a one-day mini-sprint: map, sketch, vote, make a paper prototype, then test it with 5 people."}}}, {"id": "tjtuqitz3v", "name": "B5 · Nameless", "col": "#7b3fe4", "ink": "#fff", "sym": "♠", "hand": {"future": {"k": "Wildcard", "t": "Your biggest competitor gives their product away free."}, "customer": {"t": "A street vendor near Borivali station"}, "constraint": {"t": "It must fit in a backpack"}, "practice": {"k": "3M", "t": "Book 90 minutes a week for a self-chosen experiment, then show it to the class in 3 minutes."}}}, {"id": "td6mckkz92", "name": "B6 · Auraframe", "col": "#00897b", "ink": "#fff", "sym": "♠", "hand": {"future": {"k": "Energy", "t": "Petrol costs ₹200 a litre. Everyone is rethinking how they move."}, "customer": {"t": "A delivery rider on a 10-hour shift"}, "constraint": {"t": "Test it with 10 real people this week"}, "practice": {"k": "VNV", "t": "Show a sketch to 3 real customers before you build anything."}}}, {"id": "ti2h63wzgw", "name": "B7 · Lab Desk", "col": "#ff6f61", "ink": "#1d1d1b", "sym": "♠", "hand": {"future": {"k": "Ecology", "t": "Mumbai has 30 days of extreme heat every year."}, "customer": {"t": "A first-year student living in a hostel"}, "constraint": {"t": "Only one team member can work on it"}, "practice": {"k": "Apple", "t": "Give every task one name (a DRI), and write a \"not doing\" list."}}}, {"id": "t3lcxbfzmw", "name": "B8 · Banana Stem Sanitary Pads", "col": "#3f2b96", "ink": "#fff", "sym": "♠", "hand": {"future": {"k": "Technology", "t": "Everyone has an AI assistant that does their shopping for them."}, "customer": {"t": "A visitor who speaks neither Hindi nor Marathi"}, "constraint": {"t": "It must sell for under ₹99"}, "practice": {"k": "3M", "t": "Book 90 minutes a week for a self-chosen experiment, then show it to the class in 3 minutes."}}}, {"id": "t19swfwzs2", "name": "C1 · BloomBox", "col": "#9ccc3c", "ink": "#1d1d1b", "sym": "♠", "hand": {"future": {"k": "Society", "t": "Half your customers are over 50."}, "customer": {"t": "A working mother with a 2-hour commute"}, "constraint": {"t": "It must sell for under ₹99"}, "practice": {"k": "IDEO", "t": "Pin up the 7 rules. Write one \"How might we…?\" and get 30 ideas in 20 minutes."}}}, {"id": "tul2h6tzxi", "name": "C2 · Saathi", "col": "#e91e8c", "ink": "#fff", "sym": "♠", "hand": {"future": {"k": "Society", "t": "Most young people in Mumbai live with friends, not family."}, "customer": {"t": "A small shop owner in your neighbourhood"}, "constraint": {"t": "It must work without a smartphone"}, "practice": {"k": "Samsung", "t": "Run a teardown: take a rival product apart as a mixed team and list 10 insights on value and cost."}}}, {"id": "tas762902t", "name": "C3 · BagBuddy", "col": "#455a64", "ink": "#fff", "sym": "♠", "hand": {"future": {"k": "Technology", "t": "10-minute delivery is normal for everything, not only groceries."}, "customer": {"t": "The college canteen manager"}, "constraint": {"t": "Total budget: ₹500"}, "practice": {"k": "VNV", "t": "Show a sketch to 3 real customers before you build anything."}}}, {"id": "tuml2wx08o", "name": "C4 · Tievan", "col": "#d4a017", "ink": "#1d1d1b", "sym": "♠", "hand": {"future": {"k": "Economy", "t": "Gig work is how most people under 30 earn."}, "customer": {"t": "A delivery rider on a 10-hour shift"}, "constraint": {"t": "You have 48 hours"}, "practice": {"k": "Google", "t": "Run a one-day mini-sprint: map, sketch, vote, make a paper prototype, then test it with 5 people."}}}, {"id": "toz0itl0ed", "name": "C5 · Picklepop", "col": "#3ddc97", "ink": "#1d1d1b", "sym": "♠", "hand": {"future": {"k": "Ecology", "t": "Single-use plastic is banned, with real fines."}, "customer": {"t": "A visitor who speaks neither Hindi nor Marathi"}, "constraint": {"t": "It must fit in a backpack"}, "practice": {"k": "IDEO", "t": "Pin up the 7 rules. Write one \"How might we…?\" and get 30 ideas in 20 minutes."}}}, {"id": "t1mu3x30k4", "name": "C6 · Divine Connect", "col": "#8e244d", "ink": "#fff", "sym": "♠", "hand": {"future": {"k": "Wildcard", "t": "A monsoon flood shuts the city for a week."}, "customer": {"t": "A street vendor near Borivali station"}, "constraint": {"t": "Only one team member can work on it"}, "practice": {"k": "Samsung", "t": "Run a teardown: take a rival product apart as a mixed team and list 10 insights on value and cost."}}}, {"id": "terwfzy0oy", "name": "C7 · Paddy and Platter", "col": "#f57c00", "ink": "#1d1d1b", "sym": "♠", "hand": {"future": {"k": "Rules", "t": "Every product must show who made it and where."}, "customer": {"t": "A first-year student living in a hostel"}, "constraint": {"t": "No plastic, anywhere"}, "practice": {"k": "VNV", "t": "Show a sketch to 3 real customers before you build anything."}}}, {"id": "tpo9he00u2", "name": "C8 · Charmhold", "col": "#29b6f6", "ink": "#1d1d1b", "sym": "♠", "hand": {"future": {"k": "Economy", "t": "Gig work is how most people under 30 earn."}, "customer": {"t": "A retired teacher who's new to UPI"}, "constraint": {"t": "Test it with 10 real people this week"}, "practice": {"k": "Google", "t": "Run a one-day mini-sprint: map, sketch, vote, make a paper prototype, then test it with 5 people."}}}, {"id": "ta1yv37amn", "name": "No team yet · Spare 1", "col": "#1f4fd1", "ink": "#fff", "sym": "♥", "hand": {"future": {"k": "Economy", "t": "Prices rise 20% in a year. People buy smaller packs, more often."}, "customer": {"t": "A street vendor near Borivali station"}, "constraint": {"t": "No plastic, anywhere"}, "practice": {"k": "3M", "t": "Book 90 minutes a week for a self-chosen experiment, then show it to the class in 3 minutes."}}}, {"id": "t8c8n3zb4s", "name": "No team yet · Spare 2", "col": "#c8102e", "ink": "#fff", "sym": "♥", "hand": {"future": {"k": "Ecology", "t": "Mumbai has 30 days of extreme heat every year."}, "customer": {"t": "A retired teacher who's new to UPI"}, "constraint": {"t": "You have 48 hours"}, "practice": {"k": "Apple", "t": "Give every task one name (a DRI), and write a \"not doing\" list."}}}]};  /* teams and pre-dealt hands baked in, so a phone can carry on with no network */
 function qrEl(){if(qrNode)return qrNode;qrNode=document.createElement('div');qrNode.className='qrc';if(window.QRCode){new QRCode(qrNode,{text:'https://'+SHORT_LINK,width:512,height:512,correctLevel:QRCode.CorrectLevel.M})}else{qrNode.innerHTML='<div style="padding:30px 0;text-align:center;color:#6b665c">Scan code unavailable. Type the link below.</div>';qrNode._fallback=1}return qrNode}
 function loadQR(cb){if(window.QRCode)return cb();var s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';s.onload=cb;s.onerror=cb;document.head.appendChild(s)}
 var BOXES = [
@@ -167,7 +173,7 @@ function devId(){var d=store('nh_dev');if(!d){d='d'+Math.random().toString(36).s
 /* Two ways in: served by Apps Script (google.script.run), or the copy on thenexthand.com, which posts to the same
    server with fetch and no Google cookies, so phones signed in to several Google accounts still work. */
 function viaGoogle(){return !!(window.google&&google.script&&google.script.run)}
-function post(body){return fetch(EXEC,{method:'POST',credentials:'omit',cache:'no-store',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)}).then(function(r){return r.json()})}
+function post(body){var ac=window.AbortController?new AbortController():null,tm=setTimeout(function(){if(ac)ac.abort()},12000);return fetch(EXEC,{method:'POST',credentials:'omit',cache:'no-store',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body),signal:ac?ac.signal:undefined}).then(function(r){clearTimeout(tm);return r.json()},function(e){clearTimeout(tm);throw e})}
 var ticketP=null;
 function ticket(){
   if(BOOT.t)return Promise.resolve(BOOT.t);
@@ -177,10 +183,79 @@ function ticket(){
 function call(req){
   req.event=BOOT.event; req.device=devId(); if(BOOT.key)req.key=BOOT.key;
   if(viaGoogle()){if(BOOT.t)req.t=BOOT.t;return new Promise(function(res,rej){google.script.run.withSuccessHandler(res).withFailureHandler(rej).api(req)})}
-  return ticket().then(function(t){req.t=t;return post(req)}).then(function(r){if(r&&!r.ok&&r.reload)BOOT.t='';return r},function(){return {ok:false,err:'No connection. Trying again…'}});
+  return ticket().then(function(t){req.t=t;return post(req)}).then(function(r){NET.up(true);if(r&&!r.ok&&r.reload)BOOT.t='';return r},function(){NET.up(false);return {ok:false,net:true,err:'No connection. Trying again…'}});
 }
+/* ================= OFFLINE ================= 
+   No network? The phone keeps going: it picks from the baked team list, shows the pre-dealt hand, and saves the card
+   and log on the phone. Each change waits in an outbox (in order) and sends itself when the network is back. */
+var NET={ok:true,since:0,up:function(ok){var was=this.ok;this.ok=ok;if(!ok&&was)this.since=Date.now();if(ok&&!was){setTimeout(flush,300)}banner()}};
+var QOPS={join:1,save:1,log:1,deal:1};
+function okey(k){return 'nh_'+k+'_'+BOOT.event}
+function OB(){try{return JSON.parse(store(okey('out'))||'[]')}catch(e){return []}}
+function OBset(a){store(okey('out'),JSON.stringify(a));banner()}
+function keepState(){try{if(state)store(okey('st'),JSON.stringify(state))}catch(e){}}
+function cachedState(){try{var x=JSON.parse(store(okey('st'))||'null');if(x&&x.teams)return x}catch(e){}return null}
+function baked(id){var b=OFFLINE&&OFFLINE.teams||[];for(var i=0;i<b.length;i++)if(b[i].id===id)return b[i];return null}
+function offlineView(){var c=cachedState();if(c)return c;
+  return {title:(OFFLINE&&OFFLINE.title)||'How the Best Innovate',stage:'join',cfg:{mode:'own',lock:true},teams:(OFFLINE&&OFFLINE.teams||[]).map(function(t){return {id:t.id,name:t.name,members:null,col:t.col,ink:t.ink,sym:t.sym}}),team:null}}
+function localTeam(id){var b=baked(id)||{},l=null;(state&&state.teams||[]).forEach(function(t){if(t.id===id)l=t});
+  return {id:id,name:b.name||(l&&l.name)||'Your team',col:b.col||(l&&l.col),ink:b.ink||(l&&l.ink),sym:b.sym||(l&&l.sym),members:l&&l.members!=null?l.members:null,hand:b.hand||null,redealsLeft:0,card:{S:'',C:'',O:'',R:'',E:''},cardTs:{},logs:[]}}
+function applyLocal(req){
+  if(!state)state=offlineView();
+  if(req.op==='join'&&!state.team&&req.teamId){state.team=localTeam(req.teamId)}
+  var t=state.team;if(!t){keepState();return}
+  if(req.op==='deal'&&!t.hand){var b=baked(t.id);if(b)t.hand=b.hand}
+  if(req.op==='save'){t.card=t.card||{};t.card[req.field]=req.value}
+  if(req.op==='log'){var e=req.entry||{};t.logs=[{ts:new Date().toISOString(),tested:e.tested||'',learnt:e.learnt||'',changed:e.changed||'',sales:parseInt(e.sales,10)||0,salesRs:parseInt(e.salesRs,10)||0,mine:1}].concat(t.logs||[])}
+  keepState();
+}
+function enqueue(req){var a=OB(),q={};Object.keys(req).forEach(function(k){if(['event','device','key','t'].indexOf(k)<0)q[k]=req[k]});q.qid=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  if(q.op==='save')a=a.filter(function(x){return !(x.op==='save'&&x.field===q.field)});
+  if(q.op==='deal'&&a.some(function(x){return x.op==='deal'}))return;
+  a.push(q);OBset(a)}
+/* every write goes through here: online it goes straight to the server; offline (or behind earlier queued writes) it queues */
+function send(req){
+  if(BOOT.mode==='host'||!QOPS[req.op])return call(req);
+  if(OB().length){enqueue(req);applyLocal(req);flush();return Promise.resolve({ok:true,queued:true,view:state})}
+  return call(Object.assign({},req)).then(function(r){
+    if(r&&r.net){enqueue(req);applyLocal(req);return {ok:true,queued:true,view:state}}
+    return r});
+}
+/* server views don't know about writes still waiting: lay them over so nothing typed disappears */
+function withPending(v){var a=OB();if(!a.length||!v)return v;v=JSON.parse(JSON.stringify(v));
+  a.forEach(function(q){if(q.op==='join'&&!v.team&&q.teamId){var keep=state;state=v;v.team=localTeam(q.teamId);state=keep}});
+  var t=v.team;if(!t)return v;
+  a.forEach(function(q){if(q.op==='save'){t.card=t.card||{};t.card[q.field]=q.value}
+    if(q.op==='deal'&&!t.hand){var b=baked(t.id);if(b)t.hand=b.hand}
+    if(q.op==='log'){var e=q.entry||{};t.logs=[{ts:new Date().toISOString(),tested:e.tested||'',learnt:e.learnt||'',changed:e.changed||'',sales:parseInt(e.sales,10)||0,salesRs:parseInt(e.salesRs,10)||0,mine:1}].concat(t.logs||[])}});
+  return v}
+var flushing=false,flushTimer=null,sentNote=0;
+function flush(){
+  if(flushing||BOOT.mode==='host')return;var a=OB();if(!a.length)return;flushing=true;banner();
+  var item=a[0],req={};Object.keys(item).forEach(function(k){if(k!=='qid')req[k]=item[k]});
+  call(req).then(function(r){
+    flushing=false;
+    if(r&&r.net){again(8000);return}
+    if(r&&!r.ok&&(/one moment|wait a moment/i.test(r.err||''))){again(item.op==='log'?21000:2600);return}
+    if(r&&!r.ok&&r.reload){BOOT.t='';again(1500);return}
+    var b=OB();if(b.length&&b[0].qid===item.qid)b.shift();OBset(b);
+    if(r&&r.ok&&r.view){var v=withPending(r.view);state=v;keepState();if(!b.length){sentNote=Date.now();render();if(item.op==='join'&&v.team)glow(v.team)}}
+    if(b.length)again(b[0].op==='log'&&item.op==='log'?21000:350);else banner();
+  });
+}
+function again(ms){clearTimeout(flushTimer);flushTimer=setTimeout(flush,ms)}
+setInterval(function(){if(OB().length&&!flushing)flush()},9000);
+window.addEventListener('online',function(){again(500)});
+function banner(){var n=$('net');if(!n||BOOT.mode==='host')return;var q=OB().length;
+  if(!NET.ok||q){var stuck=!NET.ok;
+    n.className='on';n.innerHTML='<span>'+(stuck?'<b>No network.</b> Carry on: everything saves on this phone and sends itself when the network is back. Keep this tab open.':'<b>Sending…</b> '+q+' change'+(q==1?'':'s')+' waiting')+(stuck&&q?' · '+q+' waiting':'')+'</span>'+
+      (stuck&&state&&state.team&&!stageAt('card')?'<button id="goOff">Show my hand and card</button>':'');
+    if($('goOff'))$('goOff').onclick=function(){store(okey('lst'),'card');render()};return}
+  if(Date.now()-sentNote<6000){n.className='on ok';n.innerHTML='<span><b>Back online.</b> Everything is saved ✓</span>';setTimeout(banner,6200);return}
+  n.className='';n.innerHTML=''}
+function revealed(){return store(okey('rev'))==='1'}
 var state=null, dirty={}, saving={}, pending={}, timers={};
-function stageAt(s){return ORDER.indexOf(state&&state.stage||'join')>=ORDER.indexOf(s)}
+function stageAt(s){var a=ORDER.indexOf(state&&state.stage||'join'),b=ORDER.indexOf(store(okey('lst'))||'join');return Math.max(a,b)>=ORDER.indexOf(s)}
 
 /* ================= STUDENT ================= */
 function renderStudent(){
@@ -201,7 +276,7 @@ function renderStudent(){
       return;
     }
     h+='<div class="panel"><h2>Which team are you in?</h2><p class="hint">'+(cf.lock?'Pick your team. Not listed? Ask your speaker.':'Pick your team. Not listed? One person creates it; everyone else waits a moment and picks it.')+' This phone stays with one team.</p>';
-    if(v.teams.length){v.teams.forEach(function(x){h+='<button class="team" data-join="'+esc(x.id)+'" data-name="'+esc(x.name)+'"><b><i style="background:'+esc(x.col)+'"></i>'+esc(x.name)+'</b><span>'+x.members+' phone'+(x.members==1?'':'s')+'</span></button>'});if(!cf.lock)h+='<div class="or">or</div>'}
+    if(v.teams.length){v.teams.forEach(function(x){h+='<button class="team" data-join="'+esc(x.id)+'" data-name="'+esc(x.name)+'"><b><i style="background:'+esc(x.col)+'"></i>'+esc(x.name)+'</b><span>'+(x.members==null?'':x.members+' phone'+(x.members==1?'':'s'))+'</span></button>'});if(!cf.lock)h+='<div class="or">or</div>'}
     if(!cf.lock)h+='<input type="text" id="newName" maxlength="40" placeholder="New team name" autocomplete="off"><div style="height:10px"></div><button class="btn" id="mk">Create team and join</button>';
     h+='<div class="err" id="err"></div>'+(cf.mode==='both'?'<button class="linkb" id="back">← No team? Spin for one</button>':'')+'</div>';
     a.innerHTML=h+'</div>';
@@ -210,19 +285,20 @@ function renderStudent(){
     if($('back'))$('back').onclick=function(){choice='spin';render()};
     return;
   }
-  h+='<button class="chip" id="chipG" style="background:'+esc(t.col||'#1f5e47')+';color:'+esc(t.ink||'#fff')+'">'+esc(t.sym||'●')+' '+esc(t.name)+' · '+t.members+' phone'+(t.members==1?'':'s')+' <u>glow</u></button>';
+  h+='<button class="chip" id="chipG" style="background:'+esc(t.col||'#1f5e47')+';color:'+esc(t.ink||'#fff')+'">'+esc(t.sym||'●')+' '+esc(t.name)+(t.members==null?'':' · '+t.members+' phone'+(t.members==1?'':'s'))+' <u>glow</u></button>';
   // hand
-  if(!stageAt('hand')&&!t.hand){h+='<div class="panel"><div class="wait"><span class="dot"></span>You\'re in. Watch the screen for the next step.</div></div>'}
-  if(stageAt('hand')||t.hand){
+  var showHand=!!t.hand&&(revealed()||stageAt('card'));
+  if(!stageAt('hand')&&!showHand){h+='<div class="panel"><div class="wait"><span class="dot"></span>You\'re in. Watch the screen for the next step.</div></div>'}
+  if(stageAt('hand')||showHand){
     h+='<div class="panel"><h2>Your hand</h2>';
-    if(!t.hand){h+='<p class="hint">Four cards: a future, a customer, a constraint and a company practice. One person taps, the whole team sees it.</p><button class="btn" id="deal">Deal our hand</button>'}
+    if(!showHand){h+='<p class="hint">Four cards: a future, a customer, a constraint and a company practice. One person taps, the whole team sees it.</p><button class="btn" id="deal">Deal our hand</button>'}
     else{
       h+='<p class="hint">5 minutes: re-play your idea with this hand. What do you keep, drop or add?</p><div class="fillin">With this hand, our idea becomes ____ for ____.</div><div class="hand">'+
       '<div class="hc f"><small>The future · '+esc(t.hand.future.k)+'</small>'+esc(t.hand.future.t)+'</div>'+
       '<div class="hc c"><small>Your customer</small>'+esc(t.hand.customer.t)+'</div>'+
       '<div class="hc k"><small>Your constraint</small>'+esc(t.hand.constraint.t)+'</div>'+
       '<div class="hc p"><small>Steal from · '+esc(t.hand.practice.k)+'</small>'+esc(t.hand.practice.t)+'</div></div>';
-      if(t.redealsLeft>0&&!stageAt('card'))h+='<div style="margin-top:12px"><button class="btn ghost small" id="redeal">Deal again (1 left)</button></div>';
+      if(t.redealsLeft>0&&!stageAt('card')&&NET.ok&&!OB().length)h+='<div style="margin-top:12px"><button class="btn ghost small" id="redeal">Deal again (1 left)</button></div>';
     }
     h+='</div>';
   }
@@ -248,7 +324,7 @@ function renderStudent(){
   if($('chipG'))$('chipG').onclick=function(){glow(t)};
   if($('pdfB'))$('pdfB').onclick=function(){takeHtml(t);setTimeout(function(){window.print()},60)};
   if($('waB'))$('waB').onclick=function(){location.href='https://wa.me/?text='+encodeURIComponent(takeText(t))};
-  if($('deal'))$('deal').onclick=function(){this.disabled=true;this.textContent='Dealing…';act({op:'deal'})};
+  if($('deal'))$('deal').onclick=function(){store(okey('rev'),'1');if(state.team&&state.team.hand){render();send({op:'deal'});return}this.disabled=true;this.textContent='Dealing…';act({op:'deal'})};
   if($('redeal'))$('redeal').onclick=function(){this.disabled=true;act({op:'redeal'})};
   if(stageAt('card'))BOXES.forEach(function(b){var el=$('f'+b.f);el.value=t.card[b.f]||'';el.oninput=function(){dirty[b.f]=1;setSt('Typing…','');clearTimeout(timers[b.f]);timers[b.f]=setTimeout(function(){saveField(b.f)},1200)};el.onblur=function(){if(dirty[b.f]){clearTimeout(timers[b.f]);saveField(b.f)}}});
   if($('addLog'))$('addLog').onclick=function(){var b=this;b.disabled=true;act({op:'log',entry:{tested:$('lT').value,learnt:$('lL').value,changed:$('lC').value,sales:$('lS').value,salesRs:$('lR').value}},function(){b.disabled=false})};
@@ -305,20 +381,21 @@ function glow(t){
 function setSt(t,c){var s=$('st');if(s){s.textContent=t;s.className='status '+(c||'')}}
 function saveField(f){
   var el=$('f'+f);if(!el)return;var val=el.value;dirty[f]=0;saving[f]=val;setSt('Saving…','');
-  call({op:'save',field:f,value:val}).then(function(r){
+  send({op:'save',field:f,value:val}).then(function(r){
     if(saving[f]===val)delete saving[f];
+    if(r&&r.queued){setSt('Saved on this phone ✓ · sends when online','ok');return}
     if(!r.ok){dirty[f]=1;setSt(r.err||'Not saved, retrying…','warn');if(!r.reload)setTimeout(function(){saveField(f)},4000);return}
     state=r.view;setSt('Saved ✓','ok');
   },function(){dirty[f]=1;setSt('No connection. Will retry…','warn');setTimeout(function(){saveField(f)},5000)});
 }
 function act(req,done){
-  call(req).then(function(r){if(done)done();if(!r.ok){showErr(r.err);return}state=r.view;render()},function(){if(done)done();showErr('No connection. Try again.')});
+  send(req).then(function(r){if(done)done();if(!r.ok){showErr(r.err);return}state=r.queued?r.view:withPending(r.view);keepState();render()},function(){if(done)done();showErr('No connection. Try again.')});
 }
 function showErr(m){var e=$('err');if(e){e.textContent=m;e.style.display='block'}else alert(m)}
 function confirmJoin(req,name){
   var s=$('sheet');$('sheetIn').innerHTML='<h2 style="margin:0 0 6px">Join '+esc(name)+'?</h2><p class="hint">This phone will stay with this team.</p><button class="btn" id="yes">Join '+esc(name)+'</button><div style="height:8px"></div><button class="btn ghost" id="no">Back</button>';
   s.classList.add('on');$('no').onclick=function(){s.classList.remove('on')};
-  $('yes').onclick=function(){this.disabled=true;this.textContent='Joining…';req.op='join';call(req).then(function(r){s.classList.remove('on');if(!r.ok){showErr(r.err);return}state=r.view;render();if(r.view.team)glow(r.view.team)},function(){s.classList.remove('on');showErr('No connection. Try again.')})};
+  $('yes').onclick=function(){this.disabled=true;this.textContent='Joining…';req.op='join';send(req).then(function(r){s.classList.remove('on');if(!r.ok){showErr(r.err);return}state=r.queued?r.view:withPending(r.view);keepState();render();if(state.team)glow(state.team)},function(){s.classList.remove('on');showErr('No connection. Try again.')})};
 }
 /* merge a fresh server view without disturbing what the person is typing */
 function mergeStudent(v){
@@ -392,13 +469,15 @@ function render(){if(BOOT.mode==='host')renderHost();else renderStudent()}
 function poll(){
   var req=BOOT.mode==='host'?{op:'board'}:{op:'state'};
   call(req).then(function(r){
+    if(r&&r.net&&BOOT.mode!=='host'){if(!state){state=offlineView();render()}banner();return}
     if(!r.ok){if(!state){$('app').innerHTML='<div class="wrap"><div class="brand"><i></i>The Next Hand · Live</div><div class="panel">'+esc(r.err)+'</div></div>'}return}
-    if(BOOT.mode==='host'){state=r.view;if(!(document.activeElement&&/^(addT|renameIn)$/.test(document.activeElement.id)))render()}else{if(!state){state=r.view;render()}else mergeStudent(r.view)}
+    if(BOOT.mode==='host'){state=r.view;if(!(document.activeElement&&/^(addT|renameIn)$/.test(document.activeElement.id)))render()}else{var v=withPending(r.view);if(!state){state=v;render()}else mergeStudent(v);keepState();if(OB().length)flush()}
   },function(){}).then(function(){setTimeout(poll,(BOOT.mode==='host'?3000:5000)+Math.random()*1500)});
 }
 if(!BOOT.event){$('app').innerHTML='<div class="wrap"><div class="brand"><i></i>The Next Hand · Live</div><div class="panel">Open the link your speaker shared.</div></div>'}
-else{$('app').innerHTML='<div class="wrap"><div class="brand"><i></i>The Next Hand · Live</div><div class="panel"><div class="wait"><span class="dot"></span>Loading…</div></div></div>';if(BOOT.mode==='host')loadQR(poll);else poll()}
-document.addEventListener('visibilitychange',function(){if(!document.hidden&&state&&BOOT.mode!=='host')call({op:'state'}).then(function(r){if(r.ok)mergeStudent(r.view)},function(){})});
+else{$('app').innerHTML='<div class="wrap"><div class="brand"><i></i>The Next Hand · Live</div><div class="panel"><div class="wait"><span class="dot"></span>Loading…</div></div></div>';if(BOOT.mode==='host')loadQR(poll);else{var c0=cachedState();if(c0){state=withPending(c0);render()}poll();if(OB().length)again(1500)}}
+if(BOOT.mode!=='host'&&!viaGoogle()&&'serviceWorker' in navigator&&/^https:|^http:\/\/localhost/.test(location.href)){try{navigator.serviceWorker.register('sw.js').catch(function(){})}catch(e){}}
+document.addEventListener('visibilitychange',function(){if(!document.hidden&&state&&BOOT.mode!=='host')call({op:'state'}).then(function(r){if(r.ok){mergeStudent(withPending(r.view));keepState();if(OB().length)flush()}},function(){})});
 </script>
 </body>
 </html>
