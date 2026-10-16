@@ -319,7 +319,7 @@ function renderStudent(){
     (t.logs||[]).forEach(function(l){h+='<div class="entry"><b>'+esc(new Date(l.ts).toLocaleDateString('en-IN',{day:'numeric',month:'short'}))+(l.sales||l.salesRs?' · '+l.sales+' sold · ₹'+l.salesRs:'')+'</b><div>'+esc(l.tested)+(l.learnt?' → '+esc(l.learnt):'')+(l.changed?' · next: '+esc(l.changed):'')+'</div></div>'});
     h+='</div>';
   }
-  h+='<div class="panel takep"><h2>Take it with you</h2><p class="hint">Your hand, your Experiment Card, your log and the six moves from today, on one page. Save it, or send it to yourself on WhatsApp.</p><div class="row2"><button class="btn" id="pdfB">Save as PDF</button><button class="btn wa" id="waB">Send to my WhatsApp</button></div><p class="hint" style="margin:8px 0 0;font-size:12.5px">PDF: in the print screen choose "Save as PDF" (iPhone: Share, then Save to Files). WhatsApp: pick "Message yourself".</p></div>';
+  h+='<div class="panel takep"><h2>Take it with you</h2><p class="hint">Your hand, your Experiment Card, your log and the six moves from today, on one page. Save it, or send it to yourself on WhatsApp.</p><a class="btn ghost" id="notesB" href="notes.pdf" target="_blank" rel="noopener" style="margin-bottom:10px;text-decoration:none">Today\'s notes (PDF, 2 pages)</a><div class="row2"><button class="btn" id="pdfB">Save as PDF</button><button class="btn wa" id="waB">Send to my WhatsApp</button></div><p class="hint" style="margin:8px 0 0;font-size:12.5px">PDF: in the print screen choose "Save as PDF" (iPhone: Share, then Save to Files). WhatsApp: pick "Message yourself".</p></div>';
   a.innerHTML=h+'</div>';
   if($('chipG'))$('chipG').onclick=function(){glow(t)};
   if($('pdfB'))$('pdfB').onclick=function(){takeHtml(t);setTimeout(function(){window.print()},60)};
