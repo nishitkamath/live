@@ -175,7 +175,7 @@ var BOXES = [
 ];
 var ORDER = ['join','hand','card','after'];
 var PAL = [['Cobalt','#1f4fd1','#fff'],['Crimson','#c8102e','#fff'],['Emerald','#0f9d58','#fff'],['Amber','#ffb300','#1d1d1b'],['Violet','#7b3fe4','#fff'],['Teal','#00897b','#fff'],['Coral','#ff6f61','#1d1d1b'],['Indigo','#3f2b96','#fff'],['Lime','#9ccc3c','#1d1d1b'],['Rose','#e91e8c','#fff'],['Slate','#455a64','#fff'],['Gold','#d4a017','#1d1d1b'],['Mint','#3ddc97','#1d1d1b'],['Plum','#8e244d','#fff'],['Orange','#f57c00','#1d1d1b'],['Sky','#29b6f6','#1d1d1b']];
-var SUITS = ['\u2660','\u2665','\u2666','\u2663'], choice = null, spinning = false, wl = null;
+var SUITS = ['\u2660','\u2665','\u2666','\u2663'], choice = null, spinning = false, wl = null, leaving = false;
 function $(id){return document.getElementById(id)}
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function store(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return store['_'+k]=v===undefined?store['_'+k]:v}}
@@ -325,6 +325,10 @@ function renderStudent(){
     return;
   }
   h+='<button class="chip" id="chipG" style="background:'+esc(t.col||'#1f5e47')+';color:'+esc(t.ink||'#fff')+'">'+esc(t.sym||'●')+' '+esc(t.name)+(t.members==null?'':' · '+t.members+' phone'+(t.members==1?'':'s'))+' <u>glow</u></button>';
+  // wrong team? step out and pick or spin again (the team keeps what it saved)
+  if(leaving){h+='<div class="panel"><h2>Leave '+esc(t.name)+'?</h2><p class="hint">Your team keeps everything it has saved. Then pick your right team, or spin for one.</p><button class="btn" id="lvY">Yes, leave this team</button><div style="height:10px"></div><button class="btn ghost" id="lvN">No, stay</button><div class="err" id="err"></div></div>';
+    a.innerHTML=h+'</div>';$('lvN').onclick=function(){leaving=false;render()};$('lvY').onclick=doLeave;return}
+  h+='<button class="linkb" id="leaveB" style="display:block;padding:6px 0 4px">Wrong team? Leave it</button>';
   // hand
   var showHand=!!t.hand&&(revealed()||stageAt('card'));
   if(!stageAt('hand')&&!showHand){h+='<div class="panel"><div class="wait"><span class="dot"></span>You\'re in. Watch the screen for the next step.</div></div>'}
@@ -361,6 +365,7 @@ function renderStudent(){
   h+='<div class="panel takep"><h2>Take it with you</h2><p class="hint">Your hand, your Experiment Card, your log and the six moves from today, on one page. Save it, or send it to yourself on WhatsApp.</p><a class="btn ghost" id="notesB" href="notes.pdf" target="_blank" rel="noopener" style="margin-bottom:10px;text-decoration:none">Today\'s notes and toolkit (PDF)</a><div class="row2"><button class="btn" id="pdfB">Save as PDF</button><button class="btn wa" id="waB">Send to my WhatsApp</button></div><p class="hint" style="margin:8px 0 0;font-size:12.5px">PDF: in the print screen choose "Save as PDF" (iPhone: Share, then Save to Files). WhatsApp: pick "Message yourself".</p></div>';
   a.innerHTML=h+'</div>';
   if($('chipG'))$('chipG').onclick=function(){glow(t)};
+  if($('leaveB'))$('leaveB').onclick=function(){leaving=true;render();window.scrollTo(0,0)};
   if($('pdfB'))$('pdfB').onclick=function(){takeHtml(t);setTimeout(function(){window.print()},60)};
   if($('waB'))$('waB').onclick=function(){location.href='https://wa.me/?text='+encodeURIComponent(takeText(t))};
   if($('deal'))$('deal').onclick=function(){store(okey('rev'),'1');if(state.team&&state.team.hand){render();send({op:'deal'});return}this.disabled=true;this.textContent='Dealing…';act({op:'deal'})};
@@ -439,6 +444,14 @@ function saveField(f){
 }
 function act(req,done){
   send(req).then(function(r){if(done)done();if(!r.ok){showErr(r.err);return}state=r.queued?r.view:withPending(r.view);keepState();render()},function(){if(done)done();showErr('No connection. Try again.')});
+}
+function doLeave(){
+  var y=$('lvY');if(OB().length){showErr('Still sending your team\'s work. Try again in a moment.');flush();return}
+  y.disabled=true;y.textContent='Leaving…';
+  call({op:'leave'}).then(function(r){
+    if(!r||r.net||!r.ok){y.disabled=false;y.textContent='Yes, leave this team';showErr(r&&r.net?'Changing team needs signal. Try again when you are online.':((r&&r.err)||'Try again.'));return}
+    leaving=false;choice=null;store(okey('rev'),'0');state=r.view;keepState();render();
+  },function(){y.disabled=false;y.textContent='Yes, leave this team';showErr('Changing team needs signal. Try again when you are online.')});
 }
 function showErr(m){var e=$('err');if(e){e.textContent=m;e.style.display='block'}else alert(m)}
 function confirmJoin(req,name){
