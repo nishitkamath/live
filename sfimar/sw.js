@@ -1,9 +1,9 @@
 /* The Next Hand · Live — offline worker. Network first; if there is no network, the copy saved on this phone.
    Only this page's own files (GET) are cached; the server calls go straight through. */
-var C = 'nh-live-v1';
+var C = 'nh-live-v2';
 self.addEventListener('install', function (e) {
   e.waitUntil(caches.open(C).then(function (c) {
-    return Promise.all(['./', './index.html', './notes.pdf'].map(function (u) { return c.add(new Request(u, { cache: 'reload' })).catch(function () {}); }));
+    return Promise.all(['./', './index.html', './notes_v3.pdf'].map(function (u) { return c.add(new Request(u, { cache: 'reload' })).catch(function () {}); }));
   }).then(function () { return self.skipWaiting(); }));
 });
 self.addEventListener('activate', function (e) {
